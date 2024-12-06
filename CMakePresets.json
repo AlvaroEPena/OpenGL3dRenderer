@@ -1,0 +1,25 @@
+﻿{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "debug",
+      "displayName": "Debug Build with vcpkg",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release Build with vcpkg",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ]
+}

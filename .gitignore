@@ -1,0 +1,21 @@
+# Build directory
+/build/
+
+# vcpkg artifacts
+/vcpkg_installed/
+/vcpkg/buildtrees/
+/vcpkg/downloads/
+/vcpkg/packages/
+/vcpkg/.vcpkg-root
+
+# IDE-specific files
+/.vs/
+/.vscode/
+*.suo
+*.vcxproj.user
+*.ncb
+*.log
+*.db
+*.opendb
+*.VC.db
+*.VC.opendb
