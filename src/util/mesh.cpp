@@ -7,7 +7,16 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* ind
     modelMatrixNeedsUpdate = true;
     updateModelMatrix();
 
-    this->initVertexBufferData(vertexArray, nVertices, indexArray, nIndices);
+    this->initVertexArrayData(vertexArray, nVertices, indexArray, nIndices);
+}
+
+Mesh::Mesh(Primitive* primitive, glm::vec3 pos, glm::vec3 rot, glm::vec3 s)
+    : position(pos), rotation(rot), scale(s)
+{
+    modelMatrixNeedsUpdate = true;
+    updateModelMatrix();
+
+    this->initVertexArrayData(primitive);
 }
 
 Mesh::~Mesh()
@@ -62,7 +71,51 @@ void Mesh::setScale(glm::vec3 s)
 
 
 
-void Mesh::initVertexBufferData(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* indexArray, const unsigned int& nIndices)
+void Mesh::initVertexArrayData(Primitive* primitive)
+{
+    this->nVertices = primitive->getVertexCount();
+    this->nIndices = primitive->getIndexCount();
+
+    useElements = nIndices > 0 ? true : false;
+    // VAO = Vertex Array object --> this is basically the object where we will store all vertexes(internally in openGL). so we must first genereate it. Pass count (1 since only one v array) and the unsigned int
+    // The unsigned int will basically be the index of the vertex array (an indentifier for  OpenGL to reference it internally). (GLsizei n, GLuint* arrays);
+    // The VAO basically wraps up all of the state needed to draw our stuff. The VAO will be recording the VBO/VBOs and its attribute pointers which indiciates how to interpret the data (think in the shaders how we set gl_position etc)
+    glGenVertexArrays(1, &this->VAO);
+    glBindVertexArray(this->VAO); // so after we generate it we can bind it with the indentifier
+
+    // VBO = Vertex Buffer object -> this is basically a big list of data, in this case read from the float list and then it is shipped off to the gpu
+    glGenBuffers(1, &this->VBO); // generate our buffers
+    glBindBuffer(GL_ARRAY_BUFFER, this->VBO); // bind it with our identifier
+    glBufferData(GL_ARRAY_BUFFER, this->nVertices * sizeof(Vertex), primitive->getVertices(), GL_STATIC_DRAW); // attach the data, calculate size in bytes, pass pointer to first item
+
+    //position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position)); // read in the data. 0 is location (vertexPos in this case), 3 is the number of members in attribute, then type, 
+    glEnableVertexAttribArray(0); // always leave false, how many bytes to go until the next one of same attribute, and lastly the starting poisition.
+    // after that call gl enable the attrib array
+
+    // color
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+    glEnableVertexAttribArray(1);
+
+    // texture coords
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+    glEnableVertexAttribArray(2);
+
+    // normals
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(3);
+
+
+    // EBO = Element Buffer Object
+    glGenBuffers(1, &EBO); // generate the EBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO); // bind the EBO
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nIndices * sizeof(unsigned int), primitive->getIndices(), GL_STATIC_DRAW); // attach indices to the EBO
+
+    // unbind
+    glBindVertexArray(0);
+}
+
+void Mesh::initVertexArrayData(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* indexArray, const unsigned int& nIndices)
 {
     this->nVertices = nVertices;
     this->nIndices = nIndices;
@@ -104,7 +157,6 @@ void Mesh::initVertexBufferData(Vertex* vertexArray, const unsigned int& nVertic
 
     // unbind
     glBindVertexArray(0);
-
 }
 
 

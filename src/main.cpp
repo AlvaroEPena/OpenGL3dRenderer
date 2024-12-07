@@ -1,6 +1,7 @@
 ﻿
 #include "common.h"
-#include "cube_mesh.h"
+#include "util/primitives/cube.h"
+#include "util/primitives/pyramid.h"
 
 #include "Camera.h"
 #include "game_map.h"
@@ -46,6 +47,15 @@ int main()
 		glfwTerminate();
 		return -1;
 	}
+	// settings
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_LESS);
+
+	// enable culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -53,14 +63,9 @@ int main()
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	// clear screen color
-	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-
 	Shader shader = ResourceManager::LoadShader("../../src/shaders/vertex.vert", "../../src/shaders/fragment.frag", NULL, "base");
-	Texture2D texture = ResourceManager::LoadTexture("../../src/images/grass.jpg", true, "grass");
-
-	CubeMesh* cube = new CubeMesh();
-
+	Texture2D texture = ResourceManager::LoadTexture("../../src/images/fff.png", true, "grass");
+	//Texture2D texture = ResourceManager::LoadTexture("../../src/images/grass.jpg", true, "grass");
 	shader.Use();
 	texture.Bind();
 
@@ -69,8 +74,6 @@ int main()
 	glm::mat4 projection = glm::mat4(1.0f);
 	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 	shader.SetMatrix4("projection", projection);
-
-	glm::mat4 view(1.f);
 
 	glm::vec3 cube_pos[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
@@ -85,132 +88,15 @@ int main()
 		glm::vec3(-1.3f,  1.0f, -1.5f),
 		glm::vec3(-2.3f,  5.0f, -30.0f)
 	};
-	glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LESS);
-
-	// enable culling
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-
-
-	Vertex vertices[] = {
-		// Front face
-		{{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 2.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // top left
-		{{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // bottom left
-		{{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // bottom right
-		{{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.25f, 2.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // top right
-
-		// Back face
-		{{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.5f, 2.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // top right
-		{{ 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // bottom right
-		{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.75f, 1.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // bottom left
-		{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.75f, 2.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // top left
-
-		// Left face
-		{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.75f, 2.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // top left
-		{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.75f, 1.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // bottom left
-		{{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // bottom right
-		{{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 2.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // top right
-
-		// Right face
-		{{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.25f, 2.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // top left
-		{{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // bottom left
-		{{ 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // bottom right
-		{{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.5f, 2.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // top right
-
-		// Top face
-		{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f}, {0.0f, 1.0f, 0.0f}}, // top left
-		{{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.25f, 2.0f / 3.0f}, {0.0f, 1.0f, 0.0f}}, // bottom left
-		{{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.5f, 2.0f / 3.0f}, {0.0f, 1.0f, 0.0f}}, // bottom right
-		{{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f}, {0.0f, 1.0f, 0.0f}}, // top right
-
-		// Bottom face
-		{{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f / 3.0f}, {0.0f, -1.0f, 0.0f}}, // bottom left
-		{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.25f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // top left
-		{{ 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // top right
-		{{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {0.0f, -1.0f, 0.0f}}  // bottom right
-	};
-
-	Vertex vertices2x2[] = {
-		// Front face
-		{{-1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 2.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // top left
-		{{-1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // bottom left
-		{{ 1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // bottom right
-		{{ 1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 2.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // top right
-
-		// Back face
-		{{ 1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 2.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // top right
-		{{ 1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // bottom right
-		{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.75f, 1.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // bottom left
-		{{-1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.75f, 2.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // top left
-
-		// Left face
-		{{-1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.75f, 2.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // top left
-		{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.75f, 1.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // bottom left
-		{{-1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // bottom right
-		{{-1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 2.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // top right
-
-		// Right face
-		{{ 1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 2.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // top left
-		{{ 1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // bottom left
-		{{ 1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // bottom right
-		{{ 1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 2.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // top right
-
-		// Top face
-		{{-1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f}, {0.0f, 1.0f, 0.0f}}, // top left
-		{{-1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 2.0f / 3.0f}, {0.0f, 1.0f, 0.0f}}, // bottom left
-		{{ 1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 2.0f / 3.0f}, {0.0f, 1.0f, 0.0f}}, // bottom right
-		{{ 1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f}, {0.0f, 1.0f, 0.0f}}, // top right
-
-		// Bottom face
-		{{-1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f / 3.0f}, {0.0f, -1.0f, 0.0f}}, // bottom left
-		{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // top left
-		{{ 1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // top right
-		{{ 1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {0.0f, -1.0f, 0.0f}}  // bottom right
-	};
-
-
-	// Indices remain the same as your data
-	unsigned int indices[] = {
-		0, 1, 2, 2, 3, 0,         // Front face
-		4, 5, 6, 6, 7, 4,         // Back face
-		8, 9, 10, 10, 11, 8,      // Left face
-		12, 13, 14, 14, 15, 12,   // Right face
-		16, 17, 18, 18, 19, 16,   // Top face
-		20, 21, 22, 22, 23, 20    // Bottom face
-	};
-
-	Vertex triangle_t[] = {
-		// Position             // Color (e.g., white)     // Texture Coords (u, v)    // Normal
-		{glm::vec3(0.0f,  0.5f,  0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.5f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f)}, // Top vertex
-		{glm::vec3(-0.5f, -0.5f,  0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)}, // Bottom-left vertex
-		{glm::vec3(0.5f, -0.5f,  0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)}  // Bottom-right vertex
-	};
-
-	Vertex s[] = {
-		// Front face
-		{{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.f}, {0.0f, 0.0f, 1.0f}}, // top left
-		{{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.f}, {0.0f, 0.0f, 1.0f}}, // bottom left
-		{{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.f, 0.f}, {0.0f, 0.0f, 1.0f}}, // bottom right
-		{{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.f, 1.f}, {0.0f, 0.0f, 1.0f}}, // top right
-
-	};
-
-	unsigned int is[] = {
-		0,1,2,
-		0,2,3
-	};
-
-
-	unsigned int indices_t[] = {
-	0, 1, 2 
-	};
 
 	//Mesh test(vertices, 24, indices, 36, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.25f));
-	Mesh test(vertices2x2, 24, indices, 36, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.5f));
+	Primitive* cube = new Cube();
+	Primitive* pyramid = new Pyramid();
+	
+	Mesh test(cube, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.5f));
+	//Mesh test(pyramid->getVertices(), pyramid->getVertexCount(), pyramid->getIndices(), pyramid->getIndexCount(), glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.5f));
 	//Mesh test(triangle_t, 4, indices_t, 6);
-	//Mesh test(s, 4, is, 6);
+
 
 
 	Map gameMap(&test, &shader);
@@ -236,13 +122,13 @@ int main()
 
 		//cout << time << endl;
 
-		//for (int i = 0; i < 11; i++) {
-		//	test.setPosition(cube_pos[i]);
-		//	test.setRotation(glm::vec3(0.f, time, 45.f));
-		//	test.render(&shader);
-		//}
+		for (int i = 0; i < 11; i++) {
+			test.setPosition(cube_pos[i]);
+			test.setRotation(glm::vec3(0.f, time, 45.f));
+			test.render(&shader);
+		}
 		
-		gameMap.draw();
+		//gameMap.draw();
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
@@ -251,7 +137,8 @@ int main()
 
 	// clean up
 	glfwTerminate();
-
+	delete cube;
+	delete pyramid;
 
 	return 0;
 }

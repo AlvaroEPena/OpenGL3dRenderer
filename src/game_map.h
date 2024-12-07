@@ -1,5 +1,5 @@
-#ifndef MAP_H
-#define MAP_H
+#ifndef CHUNK_H
+#define CHUNK_H
 
 #include "util/mesh.h"
 #include <vector>
@@ -31,4 +31,4 @@ public:
     }
 };
 
-#endif // MAP_H
+#endif // CHUNK_H

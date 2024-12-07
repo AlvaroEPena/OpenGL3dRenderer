@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include "shader.h"
-#include "texture.h"
 #include "vertex.h"
+#include "primitives/primitive.h"
 
 
 class Mesh 
@@ -12,6 +12,11 @@ class Mesh
 public:
 	Mesh(Vertex* vertexArray, const unsigned int& nVertices, 
 		unsigned int* indexArray, const unsigned int& nIndices, 
+		glm::vec3 position = glm::vec3(0.f),
+		glm::vec3 rotation = glm::vec3(0.f),
+		glm::vec3 scale = glm::vec3(1.f)
+	);
+	Mesh(Primitive* primitive,
 		glm::vec3 position = glm::vec3(0.f),
 		glm::vec3 rotation = glm::vec3(0.f),
 		glm::vec3 scale = glm::vec3(1.f)
@@ -38,7 +43,9 @@ private:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
-	void initVertexBufferData(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* indexArray, const unsigned int& nIndex);
+
+	void initVertexArrayData(Primitive* primitive);
+	void initVertexArrayData(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* indexArray, const unsigned int& nIndex);
 	void updateModelMatrix();
 
 };

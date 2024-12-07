@@ -6,18 +6,20 @@
 
 class Primitive 
 {
-public:
+protected:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-private:
-	Primitive() {}
-	virtual ~Primitive() {}
+public:
+	
+	virtual ~Primitive() = default;
+	
+	virtual void build() = 0;
 
-	void set(const Vertex* vertices, const unsigned int& nVertices,
-		unsigned int* indices, const unsigned int& nIndices);
+	Vertex* getVertices() { return vertices.data(); }
+	unsigned int* getIndices() { return indices.data(); }
+
+	unsigned int getVertexCount() const { return (unsigned int)vertices.size(); }
+	unsigned int getIndexCount() const { return (unsigned int)indices.size(); }
 };
-
-
-
 
 #endif
