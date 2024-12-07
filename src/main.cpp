@@ -88,7 +88,11 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_LESS);
 
-	Map gameMap;
+	// enable culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+
 
 	Vertex vertices[] = {
 		// Front face
@@ -128,6 +132,45 @@ int main()
 		{{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {0.0f, -1.0f, 0.0f}}  // bottom right
 	};
 
+	Vertex vertices2x2[] = {
+		// Front face
+		{{-1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 2.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // top left
+		{{-1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // bottom left
+		{{ 1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // bottom right
+		{{ 1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 2.0f / 3.0f}, {0.0f, 0.0f, 1.0f}}, // top right
+
+		// Back face
+		{{ 1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 2.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // top right
+		{{ 1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // bottom right
+		{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.75f, 1.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // bottom left
+		{{-1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.75f, 2.0f / 3.0f}, {0.0f, 0.0f, -1.0f}}, // top left
+
+		// Left face
+		{{-1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.75f, 2.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // top left
+		{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.75f, 1.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // bottom left
+		{{-1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // bottom right
+		{{-1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 2.0f / 3.0f}, {-1.0f, 0.0f, 0.0f}}, // top right
+
+		// Right face
+		{{ 1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 2.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // top left
+		{{ 1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // bottom left
+		{{ 1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // bottom right
+		{{ 1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 2.0f / 3.0f}, {1.0f, 0.0f, 0.0f}}, // top right
+
+		// Top face
+		{{-1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f}, {0.0f, 1.0f, 0.0f}}, // top left
+		{{-1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 2.0f / 3.0f}, {0.0f, 1.0f, 0.0f}}, // bottom left
+		{{ 1.0f,  1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 2.0f / 3.0f}, {0.0f, 1.0f, 0.0f}}, // bottom right
+		{{ 1.0f,  1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f}, {0.0f, 1.0f, 0.0f}}, // top right
+
+		// Bottom face
+		{{-1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 1.0f / 3.0f}, {0.0f, -1.0f, 0.0f}}, // bottom left
+		{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.25f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // top left
+		{{ 1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // top right
+		{{ 1.0f, -1.0f,  1.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f / 3.0f}, {0.0f, -1.0f, 0.0f}}  // bottom right
+	};
+
+
 	// Indices remain the same as your data
 	unsigned int indices[] = {
 		0, 1, 2, 2, 3, 0,         // Front face
@@ -164,10 +207,13 @@ int main()
 	0, 1, 2 
 	};
 
-	Mesh test(vertices, 24, indices, 36, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.5f));
+	//Mesh test(vertices, 24, indices, 36, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.25f));
+	Mesh test(vertices2x2, 24, indices, 36, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.5f));
 	//Mesh test(triangle_t, 4, indices_t, 6);
 	//Mesh test(s, 4, is, 6);
 
+
+	Map gameMap(&test, &shader);
 
 	while (!glfwWindowShouldClose(window)) {
 		GLenum err;
@@ -190,13 +236,13 @@ int main()
 
 		//cout << time << endl;
 
-		for (int i = 0; i < 11; i++) {
-			test.setPosition(cube_pos[i]);
-			test.setRotation(glm::vec3(0.f, time, 45.f));
-			test.render(&shader);
-		}
+		//for (int i = 0; i < 11; i++) {
+		//	test.setPosition(cube_pos[i]);
+		//	test.setRotation(glm::vec3(0.f, time, 45.f));
+		//	test.render(&shader);
+		//}
 		
-		
+		gameMap.draw();
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);

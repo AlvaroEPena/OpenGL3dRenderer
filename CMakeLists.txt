@@ -24,7 +24,8 @@ add_executable (OpenGL3dRenderer "src/main.cpp" "src/common.h" "src/util/stb_ima
 "src/cube_mesh.cpp" "src/cube_mesh.h" 
 "src/Camera.h" "src/game_map.h" 
 "src/util/vertex.h" 
-"src/util/mesh.h" "src/util/mesh.cpp")
+"src/util/mesh.h" "src/util/mesh.cpp"
+"src/util/primitives/primitive.h" "src/util/primitives/primitive.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET OpenGL3dRenderer PROPERTY CXX_STANDARD 20)

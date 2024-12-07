@@ -7,10 +7,11 @@
 #include "vertex.h"
 
 
-class Mesh {
+class Mesh 
+{
 public:
 	Mesh(Vertex* vertexArray, const unsigned int& nVertices, 
-		unsigned int* indexArray, const unsigned int& nIndex, 
+		unsigned int* indexArray, const unsigned int& nIndices, 
 		glm::vec3 position = glm::vec3(0.f),
 		glm::vec3 rotation = glm::vec3(0.f),
 		glm::vec3 scale = glm::vec3(1.f)

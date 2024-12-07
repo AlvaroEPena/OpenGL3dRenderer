@@ -1,13 +1,13 @@
 #include "mesh.h"
 
 
-Mesh::Mesh(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* indexArray, const unsigned int& nIndex, glm::vec3 pos, glm::vec3 rot, glm::vec3 s)
+Mesh::Mesh(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* indexArray, const unsigned int& nIndices, glm::vec3 pos, glm::vec3 rot, glm::vec3 s)
     : position(pos), rotation(rot), scale(s)
 {
     modelMatrixNeedsUpdate = true;
     updateModelMatrix();
 
-    this->initVertexBufferData(vertexArray, nVertices, indexArray, nIndex);
+    this->initVertexBufferData(vertexArray, nVertices, indexArray, nIndices);
 }
 
 Mesh::~Mesh()
@@ -62,10 +62,10 @@ void Mesh::setScale(glm::vec3 s)
 
 
 
-void Mesh::initVertexBufferData(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* indexArray, const unsigned int& nIndex)
+void Mesh::initVertexBufferData(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* indexArray, const unsigned int& nIndices)
 {
     this->nVertices = nVertices;
-    this->nIndices = nIndex;
+    this->nIndices = nIndices;
 
     useElements = nIndices > 0 ? true : false;
     // VAO = Vertex Array object --> this is basically the object where we will store all vertexes(internally in openGL). so we must first genereate it. Pass count (1 since only one v array) and the unsigned int
@@ -114,14 +114,15 @@ void Mesh::updateModelMatrix()
     {
         // create identity matrix
         this->modelMatrix = glm::mat4(1.f);
+        // apply scale
+        this->modelMatrix = glm::scale(modelMatrix, this->scale);
         // apply position
         this->modelMatrix = glm::translate(modelMatrix, this->position);
         // apply rotations
         this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians((float)this->rotation.x), glm::vec3(1.f, 0.f, 0.f));
         this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians((float)this->rotation.y), glm::vec3(0.f, 1.f, 0.f));
         this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians((float)this->rotation.z), glm::vec3(0.f, 0.f, 1.f));
-        // apply scale
-        this->modelMatrix = glm::scale(modelMatrix, this->scale);
+
         modelMatrixNeedsUpdate = false; // set updated
     }
 }

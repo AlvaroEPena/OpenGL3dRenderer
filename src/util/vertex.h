@@ -3,7 +3,8 @@
 
 #include <glm/glm.hpp>
 
-struct Vertex {
+struct Vertex 
+{
 	glm::vec3 position;
 	glm::vec3 color;
 	glm::vec2 texCoords;
