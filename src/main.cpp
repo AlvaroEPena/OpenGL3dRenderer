@@ -5,6 +5,7 @@
 
 #include "Camera.h"
 #include "game_map.h"
+#include "chunk.h"
 
 using namespace std;
 
@@ -64,7 +65,7 @@ int main()
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	Shader shader = ResourceManager::LoadShader("../../src/shaders/vertex.vert", "../../src/shaders/fragment.frag", NULL, "base");
-	Texture2D texture = ResourceManager::LoadTexture("../../src/images/fff.png", true, "grass");
+	Texture2D texture = ResourceManager::LoadTexture("../../src/images/grass.jpg", true, "grass");
 	//Texture2D texture = ResourceManager::LoadTexture("../../src/images/grass.jpg", true, "grass");
 	shader.Use();
 	texture.Bind();
@@ -90,7 +91,7 @@ int main()
 	};
 
 	//Mesh test(vertices, 24, indices, 36, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.25f));
-	Primitive* cube = new Cube();
+	Primitive* cube = new Cube(glm::vec3(0.f, 0.f, 0.f));
 	Primitive* pyramid = new Pyramid();
 	
 	Mesh test(cube, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.5f));
@@ -100,6 +101,8 @@ int main()
 
 
 	Map gameMap(&test, &shader);
+
+	Chunk testChunk(glm::vec3(0.f));
 
 	while (!glfwWindowShouldClose(window)) {
 		GLenum err;
@@ -118,16 +121,17 @@ int main()
 
 		shader.SetMatrix4("view", camera.GetViewMatrix());
 
-		float time = (float)glfwGetTime() * rot_speed;
+		//float time = (float)glfwGetTime() * rot_speed;
 
 		//cout << time << endl;
 
-		for (int i = 0; i < 11; i++) {
-			test.setPosition(cube_pos[i]);
-			test.setRotation(glm::vec3(0.f, time, 45.f));
-			test.render(&shader);
-		}
-		
+		//for (int i = 0; i < 11; i++) {
+		//	test.setPosition(cube_pos[i]);
+		//	test.setRotation(glm::vec3(0.f, time, 45.f));
+		//	test.render(&shader);
+		//}
+
+		testChunk.renderChunk(&shader);
 		//gameMap.draw();
 
 		glfwPollEvents();

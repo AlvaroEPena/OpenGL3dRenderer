@@ -1,5 +1,5 @@
-#ifndef CHUNK_H
-#define CHUNK_H
+#ifndef GAME_MAP
+#define GAME_MAP
 
 #include "util/mesh.h"
 #include <vector>
@@ -31,4 +31,4 @@ public:
     }
 };
 
-#endif // CHUNK_H
+#endif 

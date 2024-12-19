@@ -36,7 +36,7 @@ void Mesh::updateUniforms(Shader* shader)
 
 void Mesh::render(Shader* shader)
 {
-    // update model
+    // update model matrix
     this->updateUniforms(shader);
     glBindVertexArray(VAO); // bind the vertex array
 
@@ -174,6 +174,7 @@ void Mesh::updateModelMatrix()
         this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians((float)this->rotation.x), glm::vec3(1.f, 0.f, 0.f));
         this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians((float)this->rotation.y), glm::vec3(0.f, 1.f, 0.f));
         this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians((float)this->rotation.z), glm::vec3(0.f, 0.f, 1.f));
+
 
         modelMatrixNeedsUpdate = false; // set updated
     }

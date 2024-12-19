@@ -47,7 +47,6 @@ private:
 	void initVertexArrayData(Primitive* primitive);
 	void initVertexArrayData(Vertex* vertexArray, const unsigned int& nVertices, unsigned int* indexArray, const unsigned int& nIndex);
 	void updateModelMatrix();
-
 };
 
 
